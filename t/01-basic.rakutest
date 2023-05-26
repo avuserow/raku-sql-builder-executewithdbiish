@@ -1,0 +1,6 @@
+use Test;
+use SQL::Builder::ExecuteWithDBIish;
+
+pass "replace me";
+
+done-testing;

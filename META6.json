@@ -1,0 +1,25 @@
+{
+  "auth": "zef:avuserow",
+  "authors": [
+    "Adrian Kreher"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "blah blah blah",
+  "license": "Artistic-2.0",
+  "name": "SQL::Builder::ExecuteWithDBIish",
+  "perl": "6.d",
+  "provides": {
+    "SQL::Builder::ExecuteWithDBIish": "lib/SQL/Builder/ExecuteWithDBIish.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "",
+  "tags": [
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}
