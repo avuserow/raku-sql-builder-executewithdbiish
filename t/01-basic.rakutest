@@ -1,6 +1,57 @@
 use Test;
+use DBIish;
+use SQL::Builder;
 use SQL::Builder::ExecuteWithDBIish;
 
-pass "replace me";
+my $db = DBIish.connect('SQLite', :database<:memory:>);
+my $sql = SQL::Builder::ExecuteWithDBIish.new(:$db);
+
+subtest 'setup', {
+    $db.do('CREATE TABLE data(foo TEXT, bar TEXT)');
+
+    for "a" .. "z" -> $foo, $bar {
+        $sql.execute($sql.insert-into('data').data(:$foo, :$bar));
+    }
+}
+
+subtest 'scalar', {
+    is-deeply $sql.scalar($sql.from('data').select(Raw.new('COUNT(*)'))), 13;
+    is-deeply $sql.scalar($sql.from('data').select('bar').where(:foo<a>)), 'b';
+
+    throws-like {
+        $sql.scalar($sql.from('data').select('bar'));
+    }, SQL::Builder::ExecuteWithDBIish::TooManyResults;
+
+    throws-like {
+        $sql.scalar($sql.from('data').select('bar').where(:foo<zzzz>));
+    }, SQL::Builder::ExecuteWithDBIish::NoResults;
+
+    throws-like {
+        $sql.scalar($sql.from('data').select(:all).where(:foo<a>));
+    }, SQL::Builder::ExecuteWithDBIish::TooManyColumns;
+};
+
+subtest 'one', {
+    is-deeply $sql.one($sql.from('data').select(Raw.new('COUNT(*) AS count'))), {:count(13)};
+    is-deeply $sql.one($sql.from('data').select('bar').where(:foo<a>)), {:bar<b>};
+    is-deeply $sql.one($sql.from('data').select(:all).where(:foo<a>)), {:foo<a>, :bar<b>};
+
+    throws-like {
+        $sql.one($sql.from('data').select('bar'));
+    }, SQL::Builder::ExecuteWithDBIish::TooManyResults;
+
+    throws-like {
+        $sql.one($sql.from('data').select('bar').where(:foo<zzzz>));
+    }, SQL::Builder::ExecuteWithDBIish::NoResults;
+};
+
+subtest 'all', {
+    is-deeply $sql.all($sql.from('data').select(Raw.new('COUNT(*) AS count'))), ({:count(13)},);
+    is-deeply $sql.all($sql.from('data').select('bar').where(:foo<a>)), ({:bar<b>},);
+    is-deeply $sql.all($sql.from('data').select(:all).where(:foo<a>)), ({:foo<a>, :bar<b>},);
+
+    is-deeply $sql.all($sql.from('data').select('bar').where(:or, [:foo<a>, :foo<c>])), ({:bar<b>}, {:bar<d>});
+    is-deeply $sql.all($sql.from('data').select(:all).where(:or, [:foo<a>, :foo<c>])), ({:foo<a>, :bar<b>}, {:foo<c>, :bar<d>});
+};
 
 done-testing;

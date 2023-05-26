@@ -6,8 +6,10 @@
   "build-depends": [
   ],
   "depends": [
+    "DBIish",
+    "SQL::Builder"
   ],
-  "description": "blah blah blah",
+  "description": "Execute SQL::Builder queries with DBIish",
   "license": "Artistic-2.0",
   "name": "SQL::Builder::ExecuteWithDBIish",
   "perl": "6.d",
@@ -16,7 +18,7 @@
   },
   "resources": [
   ],
-  "source-url": "",
+  "source-url": "https://github.com/avuserow/raku-sql-builder-executewithdbiish",
   "tags": [
   ],
   "test-depends": [
